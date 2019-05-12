@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <title>Modal</title>
+</head>
+<style>
+    :root {
+        --zindexModal: 1;
+
+        --colorDarkMid: #444444;
+        --colorGreen: #52db6b;
+        --colorRed: #d83d3d;
+        --colorBlack: #222;
+        --colorBlueMid: #233b6e;
+        --colorBlueDark: #29435e;
+        --colorBlackTransparent: rgba(0,0,0,.6);
+    }
+
+      html {
+        box-sizing: border-box;
+        font-size: 62.5%;
+    }
+
+    *, *:before, *:after {
+        box-sizing: inherit;
+        padding: 0;
+        margin: 0;
+    }
+
+    body {
+        position: relative;
+        height: 100vh;
+        background-color: var(--colorDarkMid);
+        background-repeat: no-repeat;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /*Helper Classes*/
+
+    .center {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    /*Regular styles*/
+
+    .button {
+        background: transparent;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .button--open {
+        width: 50%;
+        padding: 1.5rem 0;
+        border-radius: 5rem;
+        border: 2px solid var(--colorGreen);
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--colorGreen);
+        background: linear-gradient(to right, var(--colorGreen) 50%, transparent 50%);
+        background-size: 200% 100%;
+        background-position: right bottom;
+        transition: all .2s;
+    }
+
+    .button--open:hover {
+        color: var(--colorDarkMid);
+        background-position: left bottom;
+    }
+
+    .button--close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        width: 2rem;
+        height: 2rem;
+        border: 2px solid var(--colorBlack);
+        border-radius: 50%;
+        color: var(--colorWhite);
+        cursor: pointer;
+        transition: 1s all;
+    }
+
+    .button--close:hover {
+        transform: rotate(540deg);
+    }
+
+    .button--close::before,
+    .button--close::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 3px;
+        height: 1.2rem;
+        background-color: var(--colorBlack);
+    }
+
+    .button--close::before {
+        transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .button--close::after {
+        transform: translate(-50%, -50%) rotate(-45deg);
+    }
+
+    .modalWrapper {
+        visibility: hidden;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--colorBlackTransparent);
+        z-index: var(--zindexModal);
+    }
+
+    .modalWrapper--active {
+        visibility: visible;
+    }
+
+    .modal {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 80%;
+        height: 70%;
+        border-radius: 1rem;
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+        overflow: auto;
+        background-color: var(--colorGreen);
+        box-shadow: 2px 1rem 1.2rem var(--colorBlackTransparent);
+        transition: all .2s;
+    }
+
+    .modal--active {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    .modal__heading {
+        font-size: 3.5rem;
+        color: var(--colorBlack);
+    }
+
+    .modal__link {
+        position: relative;
+        padding-top: 2rem;
+        font-size: 2rem;
+        font-style: italic;
+        text-decoration: none;
+        color: var(--colorBlack);
+        transition: .3s all;
+    }
+
+    .modal__link::before {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        width: 0;
+        height: 0;
+        background-color: transparent;
+        transition: .3s all;
+    }
+
+    .modal__link:hover {
+        cursor: pointer;
+        color: var(--colorBlueMid);
+    }
+
+    .modal__link:hover::before {
+        width: 100%;
+        height: 2px;
+        background-color: var(--colorBlueDark);
+    }
+
+    .fas {
+        color: var(--colorBlack);
+        padding: 2rem;
+        font-size: 15rem;
+        transition: .3s all;
+
+    }
+
+    /* Shaking cat icon when hovering */
+    .fas:hover {
+        display: block;
+        animation-name: shakeCat;
+        animation-duration: 2.5s;
+        animation-iteration-count: infinite;
+    }
+
+    @keyframes shakeCat {
+        0% {transform: rotate(0);}
+        5%, 15% {transform: rotate(5deg);}
+        10%, 25% {transform: rotate(-5deg);}
+        30% {transform: rotate(0);}
+        100% {transform: rotate(0);}
+    }
+
+    /*Media queries*/
+
+    @media (min-width: 768px) {
+        .modal {
+            width: 50rem;
+            height: 60rem;
+        }
+
+        .button--open {
+            width: 26rem;
+            padding: 2rem 0;
+        }
+
+        .button--close {
+            width: 3rem;
+            height: 3rem;
+            border-width: 3px;
+        }
+
+        .button--close::before,
+        .button--close::after {
+            height: 1.5rem;
+        }
+
+        .modal__heading {
+            font-size: 4.5rem;
+        }
+
+        .modal__link {
+            margin: 6rem 0;
+            font-size: 2.5rem;
+        }
+
+        .fas {
+            color: var(--colorBlack);
+            padding: 4rem 0;
+            font-size: 24rem;
+        }
+    }
+
+</style>
+<body>
+    <button class="button button--open center">Open Modal</button>
+    <div class="modalWrapper">
+        <div class="modal center">
+            <i class="fas fa-cat"></i>
+            <h1 class="modal__heading">Meow!</h1>
+            <a class="modal__link" href="./3.html">This is a link to task #3</a>
+            <button class="button button--close"></button>
+        </div>
+    </div>
+</body>
+<script>
+
+    const modalApp = {
+        init: function init() {
+            this.buttons = document.querySelectorAll('.button');
+            this.modal = document.querySelector('.modalWrapper');
+            this.content = document.querySelector('.modal');
+
+            // bind events
+            this.buttons.forEach(button => button.addEventListener('click', this.toggleModal.bind(modalApp)));
+            window.addEventListener('keyup', this.keyPress.bind(modalApp));
+
+            return this;
+        },
+
+        toggleModal: function toggleModal(e) {
+            this.modal.classList.toggle('modalWrapper--active');
+            this.content.classList.toggle('modal--active');
+
+            return this;
+        },
+
+        keyPress: function keyPress(e) {
+            e.key === 'Escape' ? this.toggleModal() : false;
+        }
+    }
+
+    modalApp.init();
+
+
+</script>
+</html>
